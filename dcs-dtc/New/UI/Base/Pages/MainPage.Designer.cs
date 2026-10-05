@@ -237,7 +237,7 @@ partial class MainPage
         btnKA50.FlatStyle = FlatStyle.Flat;
         btnKA50.Font = new Font("Microsoft Sans Serif", 11F, FontStyle.Bold, GraphicsUnit.Point);
         btnKA50.ForeColor = Color.Black;
-        btnKA50.Location = new Point(385, 250);
+        btnKA50.Location = new Point(204, 250);
         btnKA50.Name = "btnKA50";
         btnKA50.Padding = new Padding(5);
         btnKA50.Size = new Size(175, 112);
