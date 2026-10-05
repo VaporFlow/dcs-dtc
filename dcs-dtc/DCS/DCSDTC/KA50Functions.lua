@@ -4,7 +4,6 @@ dofile(lfs.writedir() .. 'Scripts/DCSDTC/commonFunctions.lua')
 -- 3001-3010 digits 0-9, 3011 waypoints, 3018 enter, 3019 cancel, 3026 mode selector.
 -- Mode 0.2 is data entry and 0.3 is operate.
 local KA50_PVI = 20
-local KA50_PVI_IND = 5
 local KA50_CMD_0 = 3001
 local KA50_CMD_WPT = 3011
 local KA50_CMD_ENTER = 3018
@@ -23,31 +22,6 @@ local function DTC_KA50_SetMode(value)
     DTC_Wait(400)
 end
 
-local function DTC_KA50_ReadPvi()
-    local ok, ind = pcall(DTC_ParseDisplay, KA50_PVI_IND)
-    if not ok or type(ind) ~= "table" then
-        return {}
-    end
-    return ind
-end
-
-local function DTC_KA50_Field(ind, name)
-    return DTC_trim(ind[name] or "")
-end
-
-local function DTC_KA50_IsNegative(sign)
-    return sign == "-" or sign == "−" or sign == "–" or sign == "—"
-end
-
-local function DTC_KA50_LineIsNegative(ind, signName, textName)
-    if DTC_KA50_IsNegative(DTC_KA50_Field(ind, signName)) then
-        return true
-    end
-    local text = DTC_KA50_Field(ind, textName)
-    local first = string.sub(text, 1, 1)
-    return DTC_KA50_IsNegative(first)
-end
-
 local function DTC_KA50_TypeDigits(digits)
     for i = 1, #digits do
         local n = tonumber(string.sub(digits, i, i))
@@ -57,22 +31,12 @@ local function DTC_KA50_TypeDigits(digits)
     end
 end
 
--- South/west: a leading 0 on an empty PVI line sets the minus sign.
--- North/east coordinates are typed as-is, including a leading zero.
--- If that 0 is stored as a digit instead of a sign, clear it so the value is not shifted.
-local function DTC_KA50_PrepareSign(wantNegative, signName, textName)
-    if tonumber(wantNegative) ~= 1 then
-        return
-    end
-
-    DTC_KA50_Press(KA50_CMD_0)
-    local ind = DTC_KA50_ReadPvi()
-    if DTC_KA50_LineIsNegative(ind, signName, textName) then
-        return
-    end
-
-    if DTC_KA50_Field(ind, textName) ~= "" then
-        DTC_KA50_Press(KA50_CMD_CANCEL)
+-- 0 = north or east, 1 = south or west.
+local function DTC_KA50_PrepareSign(wantNegative)
+    if tonumber(wantNegative) == 1 then
+        DTC_KA50_Press(KA50_CMD_0 + 1)
+    else
+        DTC_KA50_Press(KA50_CMD_0)
     end
 end
 
@@ -84,21 +48,25 @@ end
 
 function DTC_KA50_ExecCmd_EnterWaypoint(seq, latDigits, latNeg, lonDigits, lonNeg)
     DTC_Log("KA50 PVI enter " .. tostring(seq) .. " lat=" .. tostring(latDigits) .. " lon=" .. tostring(lonDigits))
-    DTC_KA50_Press(KA50_CMD_CANCEL)
-    DTC_KA50_Press(KA50_CMD_WPT)
+    -- Point 1: WPT once. Every later point: WPT twice, then the same entry.
+    if tonumber(seq) == 1 then
+        DTC_KA50_Press(KA50_CMD_WPT)
+    else
+        DTC_KA50_Press(KA50_CMD_WPT)
+        DTC_Wait(250)
+        DTC_KA50_Press(KA50_CMD_WPT)
+    end
+    DTC_Wait(200)
+
     DTC_KA50_TypeDigits(tostring(seq))
-    DTC_KA50_Press(KA50_CMD_ENTER)
     DTC_Wait(150)
 
-    DTC_KA50_PrepareSign(latNeg, "txt_VIT_sign", "txt_VIT")
+    DTC_KA50_PrepareSign(latNeg)
     DTC_KA50_TypeDigits(tostring(latDigits))
-    DTC_KA50_Press(KA50_CMD_ENTER)
-    DTC_Wait(150)
-
-    DTC_KA50_PrepareSign(lonNeg, "txt_NIT_sign", "txt_NIT")
+    DTC_KA50_PrepareSign(lonNeg)
     DTC_KA50_TypeDigits(tostring(lonDigits))
     DTC_KA50_Press(KA50_CMD_ENTER)
-    DTC_Wait(250)
+    DTC_Wait(300)
 end
 
 function DTC_KA50_ExecCmd_EndWaypointUpload()

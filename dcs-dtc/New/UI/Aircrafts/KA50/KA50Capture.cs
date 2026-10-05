@@ -33,7 +33,7 @@ internal class KA50Capture : WaypointCapture<Waypoint, WaypointSystem>
     {
         foreach (var d in data.data)
         {
-            var coord = Coordinate.FromDCS(d.latitude, d.longitude).ToF15EFormat();
+            var coord = Coordinate.FromDCS(d.latitude, d.longitude).ToDegreesMinutesTenths();
             var wpt = new Waypoint
             {
                 Latitude = coord.Lat,

@@ -20,7 +20,7 @@ public partial class UploadPage : AircraftSystemPage
         toolTip1.SetToolTip(chkWaypoints,
             "Types steerpoints 1-6 into the PVI-800 as ППМ waypoints. " +
             "The navigation system must already be powered. " +
-            "Upload selects ВВОД, enters latitude as DDMM.m and longitude as DDDMM.m, then returns the PVI to РАБОТА. " +
+            "Upload selects ВВОД, enters latitude as DD°MM.M' and longitude as DDD°MM.M' (one decimal minute), then returns the PVI to РАБОТА. " +
             "The PVI does not store names or elevation. South and west coordinates are entered with a minus sign. " +
             "Hold the accelerometer reset button for 1 second to upload from the cockpit.");
     }

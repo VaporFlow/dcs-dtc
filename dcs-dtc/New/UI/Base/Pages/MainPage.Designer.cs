@@ -232,18 +232,19 @@ partial class MainPage
         // 
         // btnKA50
         // 
-        btnKA50.BackColor = Color.FromArgb(48, 56, 40);
+        btnKA50.BackgroundImage = Properties.Resources.KA50;
+        btnKA50.BackgroundImageLayout = ImageLayout.Zoom;
         btnKA50.FlatStyle = FlatStyle.Flat;
         btnKA50.Font = new Font("Microsoft Sans Serif", 11F, FontStyle.Bold, GraphicsUnit.Point);
-        btnKA50.ForeColor = Color.White;
+        btnKA50.ForeColor = Color.Black;
         btnKA50.Location = new Point(385, 250);
         btnKA50.Name = "btnKA50";
         btnKA50.Padding = new Padding(5);
         btnKA50.Size = new Size(175, 112);
         btnKA50.TabIndex = 12;
         btnKA50.Text = "Ka-50 III";
-        btnKA50.TextAlign = ContentAlignment.MiddleCenter;
-        btnKA50.UseVisualStyleBackColor = false;
+        btnKA50.TextAlign = ContentAlignment.TopLeft;
+        btnKA50.UseVisualStyleBackColor = true;
         btnKA50.Click += btnKA50_Click;
         // 
         // MainPage

@@ -31,6 +31,10 @@ public class KA50Page : AircraftPage
         if (cfg.Upload == null) cfg.Upload = new();
         if (cfg.WaypointsCapture == null) cfg.WaypointsCapture = new();
         if (cfg.Waypoints == null) cfg.Waypoints = new();
+        if (RoundWaypointsToTenths(cfg.Waypoints))
+        {
+            SavePreset();
+        }
 
         return new AircraftSystemPage[]
         {
@@ -57,6 +61,29 @@ public class KA50Page : AircraftPage
     protected override void WaypointCaptureReceived(WaypointCaptureData data)
     {
         capture.CaptureReceived(data);
+    }
+
+    private static bool RoundWaypointsToTenths(WaypointSystem waypoints)
+    {
+        var changed = false;
+        foreach (var wpt in waypoints.Waypoints)
+        {
+            var coord = Coordinate.FromString(wpt.Latitude, wpt.Longitude);
+            if (coord == null)
+            {
+                continue;
+            }
+
+            var rounded = coord.ToDegreesMinutesTenths();
+            if (wpt.Latitude != rounded.Lat || wpt.Longitude != rounded.Lon)
+            {
+                wpt.Latitude = rounded.Lat;
+                wpt.Longitude = rounded.Lon;
+                changed = true;
+            }
+        }
+
+        return changed;
     }
 
     public WaypointsPage<Waypoint> GetWaypointsPage()

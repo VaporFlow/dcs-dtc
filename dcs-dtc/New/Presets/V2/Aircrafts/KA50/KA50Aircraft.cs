@@ -1,4 +1,5 @@
 using DTC.New.Presets.V2.Base;
+using DTC.Utilities;
 
 namespace DTC.New.Presets.V2.Aircrafts.KA50;
 
@@ -24,5 +25,10 @@ public class KA50Aircraft : Aircraft
     public override int GetMaxWaypointElevation()
     {
         return 35000;
+    }
+
+    public override CoordinateFormat GetWaypointCoordinateFormat()
+    {
+        return CoordinateFormat.DegreesMinutesTenths;
     }
 }
