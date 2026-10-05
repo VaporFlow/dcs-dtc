@@ -108,4 +108,9 @@ public partial class MainPage : Page
     {
         NavigateTo("OH58D");
     }
+
+    private void btnKA50_Click(object sender, System.EventArgs e)
+    {
+        NavigateTo("KA50");
+    }
 }

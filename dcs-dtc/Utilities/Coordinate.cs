@@ -251,5 +251,39 @@ namespace DTC.Utilities
             var d = new Distance(this.c, other.c);
             return (int)d.NauticalMiles;
         }
+
+        // PVI-800 keypad format. Latitude is DDMMT, longitude is DDDMMT.
+        // A leading "-" marks south or west; the digits themselves stay unsigned.
+        public string ToPvi800Latitude()
+        {
+            return FormatPvi800(this.c.Latitude, 2);
+        }
+
+        public string ToPvi800Longitude()
+        {
+            return FormatPvi800(this.c.Longitude, 3);
+        }
+
+        private static string FormatPvi800(CoordinatePart part, int degreeDigits)
+        {
+            var hemisphere = part.Position.ToString();
+            var negative = hemisphere == "S" || hemisphere == "W";
+            var degrees = (int)Math.Truncate(Convert.ToDouble(part.Degrees, CultureInfo.InvariantCulture));
+            var tenths = (int)Math.Round(part.DecimalMinute * 10d, MidpointRounding.AwayFromZero);
+            if (tenths >= 600)
+            {
+                degrees += tenths / 600;
+                tenths %= 600;
+            }
+            else if (tenths < 0)
+            {
+                tenths = 0;
+            }
+
+            var digits = degrees.ToString(CultureInfo.InvariantCulture).PadLeft(degreeDigits, '0')
+                + (tenths / 10).ToString("00", CultureInfo.InvariantCulture)
+                + (tenths % 10).ToString(CultureInfo.InvariantCulture);
+            return negative ? "-" + digits : digits;
+        }
     }
 }
